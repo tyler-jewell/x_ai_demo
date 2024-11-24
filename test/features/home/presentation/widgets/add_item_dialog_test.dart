@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/src/features/home/presentation/view_models/home_view_model.dart';
-import 'package:flutter_app/src/features/home/presentation/widgets/add_item_dialog.dart';
+import 'package:flutter_app/features/home/presentation/view_models/home_view_model.dart';
+import 'package:flutter_app/features/home/presentation/widgets/add_item_dialog.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../mocks/mock_database_service.mocks.dart';
+import '../../../../mocks/mock_data_source.mocks.dart';
 
 void main() {
-  late MockDataRepository mockRepository;
+  late MockItemRepository mockRepository;
   late HomeViewModel viewModel;
 
   Widget createDialog() {
@@ -21,7 +21,7 @@ void main() {
   }
 
   setUp(() {
-    mockRepository = MockDataRepository();
+    mockRepository = MockItemRepository();
     when(mockRepository.getItems()).thenAnswer((_) async => []);
     viewModel = HomeViewModel(repository: mockRepository);
   });
@@ -37,7 +37,9 @@ void main() {
     });
 
     testWidgets('submits valid form', (tester) async {
-      when(mockRepository.insertItem(any)).thenAnswer((_) async {});
+      when(mockRepository.insertItem(any)).thenAnswer((_) async {
+        return;
+      });
       await tester.pumpWidget(createDialog());
 
       await tester.enterText(

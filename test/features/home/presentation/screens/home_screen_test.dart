@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/src/core/domain/models/item.dart';
-import 'package:flutter_app/src/features/home/presentation/screens/home_screen.dart';
-import 'package:flutter_app/src/features/home/presentation/view_models/home_view_model.dart';
+import 'package:flutter_app/core/domain/models/item.dart';
+import 'package:flutter_app/features/home/presentation/screens/home_screen.dart';
+import 'package:flutter_app/features/home/presentation/view_models/home_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../mocks/mock_database_service.mocks.dart';
+import '../../../../mocks/mock_data_source.mocks.dart';
 
 void main() {
-  late MockDataRepository mockRepository;
+  late MockItemRepository mockRepository;
 
   Widget createHomeScreen() {
     return MaterialApp(
@@ -21,7 +21,7 @@ void main() {
   }
 
   setUp(() {
-    mockRepository = MockDataRepository();
+    mockRepository = MockItemRepository();
     when(mockRepository.getItems()).thenAnswer((_) async => []);
   });
 
