@@ -15,6 +15,22 @@ class _AddItemDialogState extends State<AddItemDialog> {
   final _descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  String? _validateTitle(String? value) =>
+      value?.isEmpty ?? true ? 'Please enter a title' : null;
+
+  String? _validateDescription(String? value) =>
+      value?.isEmpty ?? true ? 'Please enter a description' : null;
+
+  void _handleSubmit() {
+    if (_formKey.currentState!.validate()) {
+      context.read<HomeViewModel>().addItem(
+            _titleController.text,
+            _descriptionController.text,
+          );
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -34,41 +50,23 @@ class _AddItemDialogState extends State<AddItemDialog> {
             TextFormField(
               controller: _titleController,
               decoration: const InputDecoration(labelText: 'Title'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a title';
-                }
-                return null;
-              },
+              validator: _validateTitle,
             ),
             TextFormField(
               controller: _descriptionController,
               decoration: const InputDecoration(labelText: 'Description'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a description';
-                }
-                return null;
-              },
+              validator: _validateDescription,
             ),
           ],
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              context.read<HomeViewModel>().addItem(
-                    _titleController.text,
-                    _descriptionController.text,
-                  );
-              Navigator.of(context).pop();
-            }
-          },
+          onPressed: _handleSubmit,
           child: const Text('Add'),
         ),
       ],

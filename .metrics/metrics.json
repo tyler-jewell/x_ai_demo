@@ -1,0 +1,47 @@
+{
+  "lib/main.dart": 13
+,
+  "lib/src/core/data/repositories/data_repository.dart": 5
+,
+  "lib/src/core/data/repositories/mock_data_repository.dart": 9
+,
+  "lib/src/core/data/repositories/concrete_data_repository.dart": 13
+,
+  "lib/src/core/data/local/database_service.dart": 17
+,
+  "lib/src/core/domain/models/item.freezed.dart": 165
+,
+  "lib/src/core/domain/models/item.dart": 13
+,
+  "lib/src/core/domain/models/item.g.dart": 14
+,
+  "lib/src/core/presentation/view_models/base_view_model.dart": 34
+,
+  "lib/src/core/services/service_locator.dart": 19
+,
+  "lib/src/features/home/presentation/view_models/home_view_model.dart": 28
+,
+  "lib/src/features/home/presentation/screens/home_screen.dart": 50
+,
+  "lib/src/features/home/presentation/widgets/add_item_dialog.dart": 66
+,
+  "lib/src/app.dart": 16
+,
+  "test/mocks/mock_database_service.mocks.dart": 52
+,
+  "test/mocks/mock_database_service.dart": 5
+,
+  "test/core/data/repositories/concrete_data_repository_test.dart": 46
+,
+  "test/core/data/repositories/data_repository_test.dart": 45
+,
+  "test/core/data/local/database_service_test.dart": 43
+,
+  "test/features/home/presentation/view_models/home_view_model_test.dart": 58
+,
+  "test/features/home/presentation/screens/home_screen_test.dart": 61
+,
+  "test/features/home/presentation/widgets/add_item_dialog_test.dart": 51
+,
+  "test/app_test.dart": 26
+}

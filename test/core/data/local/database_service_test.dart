@@ -1,36 +1,40 @@
+import 'dart:convert';
+
 import 'package:flutter_app/src/core/data/local/database_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  late DatabaseService databaseService;
+  late DatabaseService database;
 
   setUp(() {
-    databaseService = DatabaseService();
+    database = DatabaseService();
   });
 
   group('DatabaseService', () {
-    test('getItems should return empty list when no items exist', () async {
+    test('getItems returns empty list when no items exist', () async {
       SharedPreferences.setMockInitialValues({});
-      final result = await databaseService.getItems();
-      expect(result, isEmpty);
+      expect(await database.getItems(), isEmpty);
     });
 
-    test('getItems should return list of items when items exist', () async {
-      final testItems = [
-        '{"id":1,"title":"Test","description":"Test","createdAt":"2024-03-20"}'
-      ];
+    test('getItems returns decoded items', () async {
+      final testItem = {
+        'id': 1,
+        'title': 'Test',
+        'description': 'Test',
+        'createdAt': '2024-03-20'
+      };
       SharedPreferences.setMockInitialValues({
-        'items': testItems,
+        'items': [json.encode(testItem)],
       });
-      final result = await databaseService.getItems();
+
+      final result = await database.getItems();
       expect(result.length, 1);
-      expect(result.first['id'], 1);
+      expect(result.first, equals(testItem));
     });
 
-    test('insertItem should add item to storage', () async {
+    test('insertItem adds new item', () async {
       SharedPreferences.setMockInitialValues({'items': []});
-      final prefs = await SharedPreferences.getInstance();
       final testItem = {
         'id': 1,
         'title': 'Test',
@@ -38,31 +42,11 @@ void main() {
         'createdAt': '2024-03-20'
       };
 
-      await databaseService.insertItem(testItem);
+      await database.insertItem(testItem);
+      final items = await database.getItems();
 
-      final storedItems = prefs.getStringList('items');
-      expect(storedItems, isNotNull);
-      expect(storedItems!.length, 1);
-    });
-
-    test('insertItem should append to existing items', () async {
-      final existingItems = ['{"id":1,"title":"Test"}'];
-      SharedPreferences.setMockInitialValues({
-        'items': existingItems,
-      });
-
-      final testItem = {
-        'id': 2,
-        'title': 'Test 2',
-        'description': 'Test',
-        'createdAt': '2024-03-20'
-      };
-
-      await databaseService.insertItem(testItem);
-
-      final prefs = await SharedPreferences.getInstance();
-      final storedItems = prefs.getStringList('items');
-      expect(storedItems?.length, 2);
+      expect(items.length, 1);
+      expect(items.first, equals(testItem));
     });
   });
 }

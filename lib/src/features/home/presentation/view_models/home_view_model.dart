@@ -11,13 +11,11 @@ class HomeViewModel extends BaseViewModel {
     loadItems();
   }
 
-  List<Item> get items => _items;
+  List<Item> get items => List.unmodifiable(_items);
 
   Future<void> loadItems() async {
-    final items = await handleAsync(() => _repository.getItems());
-    if (items != null) {
-      _items = items;
-    }
+    final result = await handleAsync(_repository.getItems);
+    if (result != null) _items = result;
   }
 
   Future<void> addItem(String title, String description) async {
@@ -27,9 +25,10 @@ class HomeViewModel extends BaseViewModel {
       description: description,
       createdAt: DateTime.now(),
     );
+
     await handleAsync(() async {
       await _repository.insertItem(item);
-      await loadItems();
+      _items = await _repository.getItems();
     });
   }
 }

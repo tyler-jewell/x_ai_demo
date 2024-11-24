@@ -16,13 +16,18 @@ The application is structured using the MVVM pattern with clear separation of co
 - Business logic and model definitions
 - Pure Dart code with no Flutter dependencies
 - Contains entity models and business rules
+- Uses Freezed for immutable data models
 
 ### 💾 Data Layer
 - Handles data persistence and retrieval
 - Repository pattern implementation
 - Local storage using SharedPreferences
+- JSON serialization for data persistence
 
 ## Project Structure
+
+lib/
+├── src
 
 
 

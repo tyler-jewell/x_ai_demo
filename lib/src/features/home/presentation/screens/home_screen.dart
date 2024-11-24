@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/domain/models/item.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/add_item_dialog.dart';
 
@@ -8,60 +9,47 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const _HomeScreenContent();
-  }
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('MVVM Demo')),
+        body: Consumer<HomeViewModel>(
+          builder: (_, vm, __) {
+            if (vm.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (vm.error != null) {
+              return Center(child: Text('Error: ${vm.error}'));
+            }
+            return _ItemsList(items: vm.items);
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => showDialog(
+            context: context,
+            builder: (_) => const AddItemDialog(),
+          ),
+          child: const Icon(Icons.add),
+        ),
+      );
 }
 
-class _HomeScreenContent extends StatelessWidget {
-  const _HomeScreenContent();
+class _ItemsList extends StatelessWidget {
+  final List<Item> items;
+  const _ItemsList({required this.items});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('MVVM Demo'),
+    if (items.isEmpty) {
+      return const Center(child: Text('No items yet'));
+    }
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (_, i) => ListTile(
+        title: Text(items[i].title),
+        subtitle: Text(items[i].description),
+        trailing: Text(
+          items[i].createdAt.toLocal().toString().split('.').first,
+        ),
       ),
-      body: Consumer<HomeViewModel>(
-        builder: (context, viewModel, child) {
-          if (viewModel.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (viewModel.error != null) {
-            return Center(child: Text('Error: ${viewModel.error}'));
-          }
-
-          if (viewModel.items.isEmpty) {
-            return const Center(child: Text('No items yet'));
-          }
-
-          return ListView.builder(
-            itemCount: viewModel.items.length,
-            itemBuilder: (context, index) {
-              final item = viewModel.items[index];
-              return ListTile(
-                title: Text(item.title),
-                subtitle: Text(item.description),
-                trailing: Text(
-                  item.createdAt.toLocal().toString().split('.').first,
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddItemDialog(context),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  void _showAddItemDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const AddItemDialog(),
     );
   }
 }

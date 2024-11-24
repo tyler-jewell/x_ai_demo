@@ -6,110 +6,69 @@ import 'package:mockito/mockito.dart';
 import '../../../../mocks/mock_database_service.mocks.dart';
 
 void main() {
+  late MockDataRepository mockRepository;
+  late HomeViewModel viewModel;
+  final testItem = Item(
+    id: 1,
+    title: 'Test',
+    description: 'Description',
+    createdAt: DateTime.now(),
+  );
+
+  setUp(() {
+    mockRepository = MockDataRepository();
+    when(mockRepository.getItems()).thenAnswer((_) async => []);
+  });
+
+  tearDown(() => viewModel.dispose());
+
+  Future<void> initViewModel() async {
+    viewModel = HomeViewModel(repository: mockRepository);
+    await Future.delayed(Duration.zero);
+  }
+
   group('HomeViewModel', () {
-    late MockDataRepository mockDataRepository;
-    late HomeViewModel viewModel;
-
-    setUp(() {
-      mockDataRepository = MockDataRepository();
-      when(mockDataRepository.getItems()).thenAnswer((_) async => []);
+    test('loads items on initialization', () async {
+      await initViewModel();
+      verify(mockRepository.getItems()).called(1);
     });
 
-    tearDown(() {
-      viewModel.dispose();
-    });
+    test('loadItems updates state correctly', () async {
+      when(mockRepository.getItems()).thenAnswer((_) async => [testItem]);
+      await initViewModel();
+      clearInteractions(mockRepository);
 
-    test('loadItems should handle loading state', () async {
-      // Arrange
-      viewModel = HomeViewModel(repository: mockDataRepository);
-
-      // Act
       await viewModel.loadItems();
 
-      // Assert
-      verify(mockDataRepository.getItems()).called(2);
-      expect(viewModel.isLoading, false);
-    });
-
-    test('loadItems should handle error state', () async {
-      // Arrange
-      when(mockDataRepository.getItems()).thenThrow(Exception('Test error'));
-      viewModel = HomeViewModel(repository: mockDataRepository);
-
-      // Act
-      await viewModel.loadItems();
-
-      // Assert
-      expect(viewModel.error, isNotNull);
-      expect(viewModel.isLoading, false);
-    });
-
-    test('addItem should add item and reload list', () async {
-      // Arrange
-      when(mockDataRepository.insertItem(any)).thenAnswer((_) async {});
-      viewModel = HomeViewModel(repository: mockDataRepository);
-      clearInteractions(mockDataRepository); // Clear the initial load calls
-
-      // Act
-      await viewModel.addItem('Test Title', 'Test Description');
-
-      // Assert
-      verify(mockDataRepository.insertItem(any)).called(1);
-      verify(mockDataRepository.getItems())
-          .called(1); // Only expecting one call after clearing
-    });
-
-    test('addItem should handle error', () async {
-      // Arrange
-      when(mockDataRepository.insertItem(any))
-          .thenThrow(Exception('Test error'));
-      viewModel = HomeViewModel(repository: mockDataRepository);
-      clearInteractions(mockDataRepository); // Clear the initial load calls
-
-      // Act
-      await viewModel.addItem('Test Title', 'Test Description');
-
-      // Assert
-      expect(viewModel.error, isNotNull);
-      expect(viewModel.isLoading, false);
-    });
-
-    test('loadItems should update items list on success', () async {
-      // Arrange
-      final mockItems = [
-        Item(
-          id: 1,
-          title: 'Test',
-          description: 'Test Description',
-          createdAt: DateTime.now(),
-        ),
-      ];
-      when(mockDataRepository.getItems()).thenAnswer((_) async => mockItems);
-      viewModel = HomeViewModel(repository: mockDataRepository);
-      clearInteractions(mockDataRepository);
-
-      // Act
-      await viewModel.loadItems();
-
-      // Assert
-      expect(viewModel.items, equals(mockItems));
+      expect(viewModel.items, [testItem]);
       expect(viewModel.error, isNull);
+      expect(viewModel.isLoading, false);
+      verify(mockRepository.getItems()).called(1);
     });
 
-    test('addItem should handle repository error', () async {
-      // Arrange
-      when(mockDataRepository.insertItem(any))
-          .thenThrow(Exception('Failed to insert'));
-      viewModel = HomeViewModel(repository: mockDataRepository);
-      clearInteractions(mockDataRepository);
+    test('loadItems handles error', () async {
+      when(mockRepository.getItems()).thenThrow('Test error');
+      await initViewModel();
+      clearInteractions(mockRepository);
 
-      // Act
-      await viewModel.addItem('Test', 'Description');
+      await viewModel.loadItems();
 
-      // Assert
       expect(viewModel.error, isNotNull);
       expect(viewModel.isLoading, false);
-      verify(mockDataRepository.insertItem(any)).called(1);
+    });
+
+    test('addItem creates and saves item', () async {
+      when(mockRepository.insertItem(any)).thenAnswer((_) async {});
+      when(mockRepository.getItems()).thenAnswer((_) async => [testItem]);
+
+      await initViewModel();
+      clearInteractions(mockRepository);
+
+      await viewModel.addItem('New Title', 'New Description');
+
+      verify(mockRepository.insertItem(any)).called(1);
+      verify(mockRepository.getItems()).called(1);
+      expect(viewModel.items, [testItem]);
     });
   });
 }

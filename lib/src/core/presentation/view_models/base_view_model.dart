@@ -1,26 +1,29 @@
 import 'package:flutter/foundation.dart';
 
 abstract class BaseViewModel extends ChangeNotifier {
-  bool _isLoading = false;
+  var _isLoading = false;
   String? _error;
 
   bool get isLoading => _isLoading;
   String? get error => _error;
 
   @protected
-  void setLoading(bool loading) {
-    _isLoading = loading;
+  void setLoading(bool value) {
+    if (_isLoading == value) return;
+    _isLoading = value;
     notifyListeners();
   }
 
   @protected
-  void setError(String? error) {
-    _error = error;
+  void setError(String? value) {
+    if (_error == value) return;
+    _error = value;
     notifyListeners();
   }
 
   @protected
   Future<T?> handleAsync<T>(Future<T> Function() action) async {
+    if (_isLoading) return null;
     try {
       setLoading(true);
       final result = await action();

@@ -1,16 +1,12 @@
 import '../../domain/models/item.dart';
 import './data_repository.dart';
 
-class MockDataRepository implements DataRepository {
-  final List<Item> _items = [];
+class InMemoryDataRepository implements DataRepository {
+  final _items = <Item>[];
 
   @override
-  Future<List<Item>> getItems() async {
-    return Future.value(_items);
-  }
+  Future<List<Item>> getItems() async => _items;
 
   @override
-  Future<void> insertItem(Item item) async {
-    _items.add(item);
-  }
+  Future<void> insertItem(Item item) async => _items.add(item);
 }
