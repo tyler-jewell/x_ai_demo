@@ -5,10 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../mocks/mock_data_source.mocks.dart';
+import '../../../../mocks/mock_item_service.mocks.dart';
 
 void main() {
-  late MockItemRepository mockRepository;
+  late MockItemService mockService;
   late HomeViewModel viewModel;
 
   Widget createDialog() {
@@ -21,9 +21,9 @@ void main() {
   }
 
   setUp(() {
-    mockRepository = MockItemRepository();
-    when(mockRepository.getItems()).thenAnswer((_) async => []);
-    viewModel = HomeViewModel(repository: mockRepository);
+    mockService = MockItemService();
+    when(mockService.getItems()).thenAnswer((_) async => []);
+    viewModel = HomeViewModel(service: mockService);
   });
 
   group('AddItemDialog', () {
@@ -37,9 +37,7 @@ void main() {
     });
 
     testWidgets('submits valid form', (tester) async {
-      when(mockRepository.insertItem(any)).thenAnswer((_) async {
-        return;
-      });
+      when(mockService.addItem(any)).thenAnswer((_) async {});
       await tester.pumpWidget(createDialog());
 
       await tester.enterText(
@@ -49,7 +47,7 @@ void main() {
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
 
-      verify(mockRepository.insertItem(any)).called(1);
+      verify(mockService.addItem(any)).called(1);
       expect(find.byType(AddItemDialog), findsNothing);
     });
 

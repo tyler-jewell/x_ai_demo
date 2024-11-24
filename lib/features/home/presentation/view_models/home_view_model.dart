@@ -1,20 +1,19 @@
 import 'package:flutter_app/core/domain/models/item.dart';
-import 'package:flutter_app/core/domain/repositories/item_repository.dart';
 import 'package:flutter_app/core/presentation/view_models/base_view_model.dart';
+import 'package:flutter_app/core/services/item_service.dart';
 
 class HomeViewModel extends BaseViewModel {
-  final ItemRepository _repository;
+  final ItemService _service;
   List<Item> _items = [];
 
-  HomeViewModel({required ItemRepository repository})
-      : _repository = repository {
+  HomeViewModel({required ItemService service}) : _service = service {
     loadItems();
   }
 
   List<Item> get items => List.unmodifiable(_items);
 
   Future<void> loadItems() async {
-    final result = await handleAsync(_repository.getItems);
+    final result = await handleAsync(_service.getItems);
     if (result != null) _items = result;
   }
 
@@ -27,8 +26,8 @@ class HomeViewModel extends BaseViewModel {
     );
 
     await handleAsync(() async {
-      await _repository.insertItem(item);
-      _items = await _repository.getItems();
+      await _service.addItem(item);
+      _items = await _service.getItems();
     });
   }
 }

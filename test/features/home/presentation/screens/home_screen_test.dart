@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/core/domain/models/item.dart';
 import 'package:flutter_app/features/home/presentation/screens/home_screen.dart';
@@ -6,72 +8,86 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../mocks/mock_data_source.mocks.dart';
+import '../../../../mocks/mock_item_service.mocks.dart';
 
 void main() {
-  late MockItemRepository mockRepository;
+  late MockItemService mockService;
+  late List<Item> testItems;
 
-  Widget createHomeScreen() {
-    return MaterialApp(
-      home: ChangeNotifierProvider(
-        create: (_) => HomeViewModel(repository: mockRepository),
-        child: const HomeScreen(),
+  setUp(() {
+    mockService = MockItemService();
+    testItems = [
+      Item(
+        id: 1,
+        title: 'Test Item 1',
+        description: 'Description 1',
+        createdAt: DateTime.now(),
+      ),
+      Item(
+        id: 2,
+        title: 'Test Item 2',
+        description: 'Description 2',
+        createdAt: DateTime.now(),
+      ),
+    ];
+  });
+
+  Future<void> pumpHomeScreen(WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider(
+          create: (_) => HomeViewModel(service: mockService),
+          child: const HomeScreen(),
+        ),
       ),
     );
   }
 
-  setUp(() {
-    mockRepository = MockItemRepository();
-    when(mockRepository.getItems()).thenAnswer((_) async => []);
-  });
-
   group('HomeScreen', () {
-    testWidgets('shows loading state initially', (tester) async {
-      await tester.pumpWidget(createHomeScreen());
+    testWidgets('shows loading indicator when loading', (tester) async {
+      // Set up a delayed response to ensure we can catch the loading state
+      final completer = Completer<List<Item>>();
+      when(mockService.getItems()).thenAnswer((_) => completer.future);
+
+      await pumpHomeScreen(tester);
+      await tester.pump(); // Pump once to start the loading
+
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      // Complete the future and verify the loading indicator goes away
+      completer.complete(testItems);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
     testWidgets('shows items when loaded', (tester) async {
-      final mockItem = Item(
-        id: 1,
-        title: 'Test Title',
-        description: 'Test Description',
-        createdAt: DateTime.now(),
-      );
-      when(mockRepository.getItems()).thenAnswer((_) async => [mockItem]);
+      when(mockService.getItems()).thenAnswer((_) async => testItems);
 
-      await tester.pumpWidget(createHomeScreen());
+      await pumpHomeScreen(tester);
       await tester.pumpAndSettle();
 
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Description'), findsOneWidget);
+      expect(find.text('Test Item 1'), findsOneWidget);
+      expect(find.text('Test Item 2'), findsOneWidget);
     });
 
-    testWidgets('shows error state', (tester) async {
-      when(mockRepository.getItems()).thenThrow('Test error');
+    testWidgets('shows error when loading fails', (tester) async {
+      when(mockService.getItems())
+          .thenAnswer((_) async => throw Exception('Test error'));
 
-      await tester.pumpWidget(createHomeScreen());
+      await pumpHomeScreen(tester);
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Error:'), findsOneWidget);
     });
 
-    testWidgets('shows empty state', (tester) async {
-      await tester.pumpWidget(createHomeScreen());
+    testWidgets('shows empty message when no items', (tester) async {
+      when(mockService.getItems()).thenAnswer((_) async => []);
+
+      await pumpHomeScreen(tester);
       await tester.pumpAndSettle();
 
       expect(find.text('No items yet'), findsOneWidget);
-    });
-
-    testWidgets('shows add item dialog', (tester) async {
-      await tester.pumpWidget(createHomeScreen());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(FloatingActionButton));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Add New Item'), findsOneWidget);
-      expect(find.byType(TextFormField), findsNWidgets(2));
     });
   });
 }

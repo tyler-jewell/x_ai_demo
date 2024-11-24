@@ -3,10 +3,10 @@ import 'package:flutter_app/features/home/presentation/view_models/home_view_mod
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../../../mocks/mock_data_source.mocks.dart';
+import '../../../../mocks/mock_item_service.mocks.dart';
 
 void main() {
-  late MockItemRepository mockRepository;
+  late MockItemService mockService;
   late HomeViewModel viewModel;
   final testItem = Item(
     id: 1,
@@ -16,8 +16,8 @@ void main() {
   );
 
   setUp(() {
-    mockRepository = MockItemRepository();
-    when(mockRepository.getItems()).thenAnswer((_) async => []);
+    mockService = MockItemService();
+    when(mockService.getItems()).thenAnswer((_) async => []);
   });
 
   tearDown(() {
@@ -26,19 +26,19 @@ void main() {
 
   group('HomeViewModel', () {
     test('loads items on initialization', () async {
-      when(mockRepository.getItems()).thenAnswer((_) async => []);
-      viewModel = HomeViewModel(repository: mockRepository);
+      when(mockService.getItems()).thenAnswer((_) async => []);
+      viewModel = HomeViewModel(service: mockService);
       await Future.delayed(const Duration(milliseconds: 50));
-      verify(mockRepository.getItems()).called(1);
+      verify(mockService.getItems()).called(1);
     });
 
     test('loadItems updates state correctly', () async {
-      when(mockRepository.getItems()).thenAnswer((_) async => [testItem]);
-      viewModel = HomeViewModel(repository: mockRepository);
+      when(mockService.getItems()).thenAnswer((_) async => [testItem]);
+      viewModel = HomeViewModel(service: mockService);
       await Future.delayed(const Duration(milliseconds: 50));
 
-      clearInteractions(mockRepository);
-      when(mockRepository.getItems()).thenAnswer((_) async => [testItem]);
+      clearInteractions(mockService);
+      when(mockService.getItems()).thenAnswer((_) async => [testItem]);
 
       await viewModel.loadItems();
       await Future.delayed(const Duration(milliseconds: 50));
@@ -46,16 +46,16 @@ void main() {
       expect(viewModel.items, [testItem]);
       expect(viewModel.error, isNull);
       expect(viewModel.isLoading, false);
-      verify(mockRepository.getItems()).called(1);
+      verify(mockService.getItems()).called(1);
     });
 
     test('loadItems handles error', () async {
-      when(mockRepository.getItems()).thenAnswer((_) async => []);
-      viewModel = HomeViewModel(repository: mockRepository);
+      when(mockService.getItems()).thenAnswer((_) async => []);
+      viewModel = HomeViewModel(service: mockService);
       await Future.delayed(const Duration(milliseconds: 50));
 
-      clearInteractions(mockRepository);
-      when(mockRepository.getItems()).thenThrow('Test error');
+      clearInteractions(mockService);
+      when(mockService.getItems()).thenThrow('Test error');
 
       await viewModel.loadItems();
       await Future.delayed(const Duration(milliseconds: 50));
@@ -65,19 +65,19 @@ void main() {
     });
 
     test('addItem creates and saves item', () async {
-      when(mockRepository.getItems()).thenAnswer((_) async => []);
-      viewModel = HomeViewModel(repository: mockRepository);
+      when(mockService.getItems()).thenAnswer((_) async => []);
+      viewModel = HomeViewModel(service: mockService);
       await Future.delayed(const Duration(milliseconds: 50));
 
-      clearInteractions(mockRepository);
-      when(mockRepository.insertItem(any)).thenAnswer((_) async {});
-      when(mockRepository.getItems()).thenAnswer((_) async => [testItem]);
+      clearInteractions(mockService);
+      when(mockService.addItem(any)).thenAnswer((_) async {});
+      when(mockService.getItems()).thenAnswer((_) async => [testItem]);
 
       await viewModel.addItem('New Title', 'New Description');
       await Future.delayed(const Duration(milliseconds: 50));
 
-      verify(mockRepository.insertItem(any)).called(1);
-      verify(mockRepository.getItems()).called(1);
+      verify(mockService.addItem(any)).called(1);
+      verify(mockService.getItems()).called(1);
       expect(viewModel.items, [testItem]);
     });
   });

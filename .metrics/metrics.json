@@ -1,7 +1,7 @@
 {
   "lib/core/data/datasources/item_data_source.dart": 4
 ,
-  "lib/core/data/datasources/local/shared_prefs_data_source.dart": 20
+  "lib/core/data/datasources/local_item_data_source.dart": 20
 ,
   "lib/core/data/repositories/item_repository_impl.dart": 13
 ,
@@ -15,9 +15,11 @@
 ,
   "lib/core/presentation/view_models/base_view_model.dart": 34
 ,
-  "lib/core/services/service_locator.dart": 24
+  "lib/core/services/item_service.dart": 17
 ,
-  "lib/features/home/presentation/view_models/home_view_model.dart": 28
+  "lib/core/services/service_locator.dart": 20
+,
+  "lib/features/home/presentation/view_models/home_view_model.dart": 27
 ,
   "lib/features/home/presentation/screens/home_screen.dart": 50
 ,
@@ -27,9 +29,15 @@
 ,
   "lib/app.dart": 16
 ,
+  "test/mocks/mock_item_service.dart": 4
+,
   "test/mocks/mock_data_source.dart": 8
 ,
   "test/mocks/mock_data_source.mocks.dart": 52
+,
+  "test/mocks/mock_item_service.mocks.dart": 26
+,
+  "test/core/data/datasources/local_data_source_test.dart": 53
 ,
   "test/core/data/datasources/local/shared_prefs_data_source_test.dart": 53
 ,
@@ -43,9 +51,9 @@
 ,
   "test/features/home/presentation/view_models/home_view_model_test.dart": 67
 ,
-  "test/features/home/presentation/screens/home_screen_test.dart": 61
+  "test/features/home/presentation/screens/home_screen_test.dart": 72
 ,
-  "test/features/home/presentation/widgets/add_item_dialog_test.dart": 53
+  "test/features/home/presentation/widgets/add_item_dialog_test.dart": 51
 ,
-  "test/app_test.dart": 26
+  "test/app_test.dart": 29
 }

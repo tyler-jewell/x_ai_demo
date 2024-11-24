@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter_app/core/data/datasources/item_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPrefsDataSource implements ItemDataSource {
+class LocalItemDataSource implements ItemDataSource {
   static const _itemsKey = 'items';
 
   final SharedPreferences prefs;
 
-  SharedPrefsDataSource({required this.prefs});
+  LocalItemDataSource({required this.prefs});
 
   @override
   Future<List<Map<String, dynamic>>> getItems() async {
